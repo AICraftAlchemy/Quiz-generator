@@ -147,6 +147,35 @@ def set_page_config():
             color: #424242;
             text-align: center;
         }
+        .score-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .score-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .score-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .score-percentage {
+            font-size: 24px;
+            color: #6c757d;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 40px;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -264,14 +293,25 @@ def quiz_interface():
                         st.warning("Please select an answer before proceeding.")
 
         else:
+            score = sum(1 for i, (_, _, correct_answer) in enumerate(st.session_state.questions)
+                        if st.session_state.user_answers.get(i) == correct_answer)
+            percentage = (score / 10) * 100
+
             st.markdown("## Quiz Results")
-            score = 0
+            st.markdown(
+                f"""
+                <div class="score-card">
+                    <div class="score-title">Your Final Score</div>
+                    <div class="score-value">{score}/10</div>
+                    <div class="score-percentage">({percentage:.1f}%)</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
             
             for i, (question, options, correct_answer) in enumerate(st.session_state.questions):
                 user_answer = st.session_state.user_answers.get(i)
                 is_correct = user_answer == correct_answer
-                if is_correct:
-                    score += 1
                 
                 st.markdown(f"### Question {i + 1}")
                 st.markdown(f"<div class='question-text'>{question}</div>", unsafe_allow_html=True)
@@ -283,9 +323,6 @@ def quiz_interface():
                     unsafe_allow_html=True
                 )
                 st.markdown("---")
-
-            percentage = (score / 10) * 100
-            st.markdown(f"## Final Score: {score}/10 ({percentage:.1f}%)")
             
             if st.button("Start New Quiz"):
                 for key in ['questions', 'current_question', 'user_answers', 'quiz_completed', 'quiz_started', 'selected_topic', 'selected_difficulty']:
@@ -301,6 +338,14 @@ def main():
         logger.error(f"An error occurred: {str(e)}")
         logger.error(traceback.format_exc())
         st.error("An unexpected error occurred. Please refresh the page and try again.")
+        
+    # Footer
+    st.markdown("""
+    <div class='footer'>
+    Developed by <a href='https://aicraftalchemy.github.io'>Ai Craft Alchemy</a><br>
+     Connect with us: <a href='tel:+917661081043'>+91 7661081043</a>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
